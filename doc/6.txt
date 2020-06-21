@@ -1,0 +1,400 @@
+第六章 输入/输出流和文件
+目录
+6.1 输入/输出流
+6.1 输入/输出流
+6.1.1 I/O流的概念 
+6.1.1 I/O流的概念(续) 
+6.1.1 I/O流的概念(续)			——源和目标的类型
+6.1.1 I/O流的概念(续)			——读写数据的方法
+6.1.2 预定义的I/O流类概述
+6.1.2 预定义的I/O流类概述(续)	——java.io包的顶级层次结构
+6.1.2 预定义的I/O流类概述(续)	            ——面向字符的流
+6.1.2 预定义的I/O流类概述(续)	            ——面向字符的流
+6.1.2 预定义的I/O流类概述(续)	            ——面向字符的流
+6.1.2 预定义的I/O流类概述(续)	            ——面向字符的流
+6.1.2 预定义的I/O流类概述(续)	            ——面向字节的流
+6.1.2 预定义的I/O流类概述(续)	            ——面向字节的流
+6.1.2 预定义的I/O流类概述(续)	            ——面向字节的流
+6.1.2 预定义的I/O流类概述(续)	            ——标准输入输出
+6.1.2 预定义的I/O流类概述(续)	            		——例6_1
+Java SE 5.0新特性
+一个方便的扫描API: 把文本转化成基本类型或者String
+Scanner s = new Scanner(System.in);
+int n = s.nextInt();
+还有下列方法：next.Byte(),nextDouble(),nextFloat,nextInt(),nextLine(),nextLong(),nextShort()
+6.1.2 预定义的I/O流类概述(续)	            		——处理流
+6.1.2 预定义的I/O流类概述(续)	            	——I/O异常
+6.2 文件读写
+写文本文件
+读文本文件
+写二进制文件
+读二进制文件
+File类
+对象序列化
+6.2.1 写文本文件 
+6.2.1 写文本文件(续)	            	——例6_2
+在C盘根目录创建文本文件Hello.txt，并往里写入若干行文本
+import java.io.*;   
+class Ex6_2 {
+  public static void main ( String[] args ) throws IOException {  
+     //main方法中声明抛出IO异常
+     String fileName = "C:\\Hello.txt"; 
+     FileWriter writer = new FileWriter( fileName );   
+     writer.write( "Hello!\n"); 
+     writer.write( "This is my first text file,\n"  );  
+     writer.write( "You can see how this is done.\n" ); 
+     writer.write("输入一行中文也可以\n");
+     writer.close(); 
+  }
+}
+6.2.1 写文本文件(续)	            ——例6_2运行结果
+打开C盘根目录下的Hello.txt文件
+
+
+
+
+
+换行有些问题，例6_4中将解决这个问题
+6.2.1 写文本文件(续)	            	——例6_2说明
+每次运行这个程序，都将删除已经存在的”Hello.txt”文件，创建一个新的同名文件
+FileWriter的构造方法有五个，本例是通过一个字符串指定文件名来创建
+FileWriter类的write方法向文件中写入字符
+
+6.2.1 写文本文件(续)	          ——例6_2说明（续）
+Writer类的流可实现内部格式到外部磁盘文件格式的转换
+“Hello.txt”是一个普通的ASCII码文本文件，每个英文字符占一个字节，中文字符占两个字节
+Java程序中的字符串则是每个字符占两个字节的，采用Unicode编码
+
+
+
+
+close方法清空流里的内容并关闭它。如果不调用该方法，可能系统还没有完成所有数据的写操作，程序就结束了
+6.2.1 写文本文件(续)	            	——例6_3
+处理IO异常
+import java.io.*;   
+class Ex6_3 {
+  public static void main ( String[] args ) {
+    String fileName = "c:\\Hello.txt" ;
+    try {  //将所有IO操作放入try块中
+  	   FileWriter writer = new FileWriter( fileName ,true );
+ 	   writer.write( "Hello!\n");  
+    	   writer.write( "This is my first text file,\n"  );  
+    	   writer.write( "You can see how this is done. \n" );
+        writer.write("输入一行中文也可以\n");
+     	 writer.close();
+    }
+    catch ( IOException iox) { 
+        System.out.println("Problem writing" + fileName ); }
+    }
+}
+6.2.1 写文本文件(续)	            	——例6_3说明
+运行此程序，会发现在原文件内容后面又追加了重复的内容，这就是将构造方法的第二个参数设为true的效果
+如果将文件属性改为只读属性，再运行本程序，就会出现IO错误，程序将转入catch块中，给出出错信息
+6.2.1 写文本文件(续)	           ——BufferedWriter类
+6.2.1 写文本文件(续)	            	——例6_4
+使用BufferedWriter完成例6-2实现的功能
+import java.io.*;  //ex6_4
+class Ex6_4 {
+	public static void main ( String[] args ) throws IOException	{
+		String fileName = "C:/newHello.txt" ;
+		BufferedWriter out = new BufferedWriter( 
+                                              new  FileWriter( fileName ) );
+       out.write( "Hello!"  );
+    		 out.newLine() ; 
+ 		 out.write( "This is another text file using BufferedWriter,"  );   
+        out.newLine(); ;
+        out.write( "So I can use a common way to start a newline" ); 
+        out.close();
+    }
+}
+6.2.1 写文本文件(续)	            ——例6_4运行结果
+用任何文本编辑器打开newHello.txt都会出现正确的换行效果
+6.2.2 读文本文件 
+6.2.2 读文本文件(续) 
+FileReader类
+从文本文件中读取字符
+继承自Reader抽象类的子类InputStreamReader
+BufferedReader
+读文本文件的缓冲器类
+具有readLine()方法，可以对换行符进行鉴别，一行一行地读取输入流中的内容
+继承自Reader
+6.2.2 读文本文件(续) 
+6.2.2 读文本文件(续)	            	——例6_5
+从Hello.txt中读取文本并显示在屏幕上
+import java.io.*;
+class Ex6_5 {
+    public static void main ( String[] args ) {
+        String fileName = "C:/Hello.txt" , line;
+        try {
+             BufferedReader in = new BufferedReader(
+                                              new FileReader( fileName  ) );
+             line = in.readLine();   //读取一行内容
+             while ( line != null ) { 
+       	System.out.println( line );
+      		line = in.readLine();
+     	      }
+            in.close(); 
+        }
+       catch ( IOException iox ) { 
+            System.out.println("Problem reading " + fileName );  
+        }
+    }
+}
+6.2.2 读文本文件(续)	            	——例6_5说明
+运行该程序，屏幕上将逐行显示出Hello.txt文件中的内容
+FileReader对象：创建后将打开文件，如果文件不存在，会抛出一个IOException
+BufferedReader类的readLine()方法：从一个面向字符的输入流中读取一行文本。如果其中不再有数据，返回null
+Reader类的read()方法：也可用来判别文件结束。该方法返回的一个表示某个字符的int型整数，如果读到文件末尾，返回 -1。据此，可修改本例中的读文件部分：
+int c;
+while((c=in.read())!= -1)  System.out.print((char)c);
+close()方法：为了操作系统可以更为有效地利用有限的资源，应该在读取完毕后，调用该方法
+6.2.2 读文本文件(续)	            	    ——例6_6
+6.2.2 读文本文件(续)	            	    ——例6_6
+共包括两个类
+CopyMaker
+private boolean openFiles()
+private boolean copyFiles()
+private boolean closeFiles()
+public boolean copy(String src, String dst ) 
+Ex6_6
+main()   
+6.2.2 读文本文件(续)	            	    ——例6_6
+import java.io.*; 
+class CopyMaker {
+     String sourceName, destName;
+     BufferedReader source;
+   	 BufferedWriter dest;
+     String line;
+6.2.2 读文本文件(续)	            	    ——例6_6
+private boolean openFiles() {
+   	 try {
+   	     source = new BufferedReader(new FileReader( sourceName ));
+ 	 }
+   	 catch ( IOException iox ) {
+    	    System.out.println("Problem opening " + sourceName ); 
+         return false;
+      }
+      try {
+    	     dest = new BufferedWriter(new FileWriter( destName )); 
+      }
+      catch ( IOException iox )
+      {
+    	    System.out.println("Problem opening " + destName );
+         return false;
+      }
+      return true;
+ }  
+6.2.2 读文本文件(续)	            	    ——例6_6
+private boolean copyFiles() {
+   	try {
+   	    line = source.readLine(); 
+         while ( line != null ) {
+            dest.write(line); 
+            dest.newLine(); 
+            line = source.readLine();  
+         }
+      }
+     catch ( IOException iox ) {
+    	    System.out.println("Problem reading or writing" );
+         return false;
+      }
+     return true;
+ }
+   
+6.2.2 读文本文件(续)	            	    ——例6_6
+private boolean closeFiles() {
+   	boolean retVal=true;
+     try {  source.close(); }
+     catch ( IOException iox ) {
+    	    System.out.println("Problem closing " + sourceName );
+        retVal = false;
+      }
+      try {  dest.close();   }
+      catch ( IOException iox ) {
+    	     System.out.println("Problem closing " + destName );
+           retVal = false;
+       }
+       return retVal;  
+ }
+    
+6.2.2 读文本文件(续)	            	    ——例6_6
+   public boolean copy(String src, String dst ) {
+    	   sourceName = src ;
+        destName   = dst ;
+        return openFiles() && copyFiles() && closeFiles();
+    }
+}
+public class Ex6_6   //一个文件中只能有一个公有类
+{
+	public static void main ( String[] args ) {
+    	    if ( args.length == 2 )  new CopyMaker().copy(args[0], args[1]);
+         else   System.out.println("Please Enter File names"); 
+      }
+}     
+6.2.2 读文本文件(续)	            ——例6_6运行结果
+此文件Ex6_6.java编译后生成Ex6_6.class和CopyMaker.class两个字节码文件
+运行结果
+在命令行方式下执行如下命令
+java TestCopy d:\Hello.txt d:\CopyHello.txt
+则在D盘根目录下会出现CopyHello.txt文件，内容与Hello.txt完全相同
+
+6.2.3 写二进制文件 
+6.2.3 写二进制文件(续)	            ——OutputStream类
+6.2.3 写二进制文件(续)	        		——表6_2
+6.2.3 写二进制文件(续)	        		——表6_2
+6.2.3 写二进制文件(续)	   ——BufferedOutputStream类
+6.2.4 读二进制文件 
+6.2.4 读写二进制文件(续)	            			——例
+TestFigCopy.java
+6.2.4 读写二进制文件(续)	            			——例
+DataInputStream顾名思义：就是专门用来读各种各样的数据的，比如（int，char，long等），一定要注意 DataOutputStream 与DataInputStream配合使用，而且二者读写的顺序要一样
+TestBinary.java
+6.2.5 File 类 
+6.2.5 File类(续)	      		 ——构造方法
+6.2.5 File类(续)	      		    ——常用方法
+6.2.5 File类(续)	      		    ——例6_13
+例6_13 在C盘创建文件Hello.txt，如果存在则删除旧文件，不存在则直接创建新的
+import java.io.*;
+public class Ex6_13 {
+	public static void main(String[] args) {
+		File f=new File("c:"+File.separator+"Hello.txt"); 		if (f.exists())  f.delete();
+		else
+		  try{
+		    f.createNewFile();
+		  }
+		  catch(Exception e){ 	  
+          System.out.println(e.getMessage());
+		  }
+	}
+}
+6.2.5 File类(续)	      		   ——例6_13运行结果
+运行结果
+因为在例6_2中已经创建了c:\Hello.txt，所以第一次运行将删除这个文件
+第二次运行则又创建了一个此名的空文件
+分析
+在试图打开文件之前，可以使用File类的isFile方法来确定File对象是否代表一个文件而非目录）
+还可通过exists方法判断同名文件或路径是否存在，进而采取正确的方法，以免造成误操作
+6.2.5 File类(续)	      	  ——改进的文件复制程序
+6.2.5 File类(续)	      	  ——改进的文件复制程序
+6.2.7 对象序列化
+6.2.7 对象序列化(续)——ObjectInputStream/ObjectOutputStream类
+ObjectInputStream和ObjectOutputStream
+实现对象的读写
+通过ObjectOutputStream把对象写入磁盘文件
+通过ObjectInputStream把对象读入程序
+不保存对象的transient和static类型的变量
+对象要想实现序列化，其所属的类必须实现Serializable接口
+6.2.7 对象序列化(续)	  ——写入ObjectOutputStream
+6.2.7 对象序列化(续)	 ——用ObjectInputStream读入
+6.2.7 对象序列化(续)	  		——Seriealizable接口
+6.2.7 对象序列化(续)	  			——例6_17
+创建一个书籍对象，并把它输出到一个文件book.dat中，然后再把该对象读出来，在屏幕上显示对象信息
+class Book implements Serializable {
+	int id;
+	String name;
+	String author;
+	float price;
+	public Book(int id,String name,String author,float price) {
+		this.id=id;
+		this.name=name;
+		this.author=author;
+		this.price=price;
+	}
+}
+6.2.7 对象序列化(续)	  			——例6_17
+import java.io.*;
+public class Ex6_17 {
+	public static void main(String args[]) throws                                          
+                    IOException,ClassNotFoundException {
+	    Book book=new Book(100032,"Java Programming 
+                                               Skills","Wang Sir",30);
+	    ObjectOutputStream oos=new ObjectOutputStream(
+                               new FileOutputStream("c:/book.dat"));       
+        oos.writeObject(book);
+	    oos.close(); 	
+6.2.7 对象序列化(续)	  			——例6_17
+        book=null;
+	    ObjectInputStream ois=new ObjectInputStream(
+	                            new FileInputStream("c:/book.dat"));    
+         book=(Book)ois.readObject(); 
+	     ois.close(); 
+ 	     System.out.println("ID is:"+book.id);  
+	     System.out.println("name is:"+book.name);
+	     System.out.println("author is:"+book.author);
+	     System.out.println("price is:"+book.price);
+	}
+}
+
+6.2.7 对象序列化(续)	  		——例6_17运行结果
+运行结果
+将生成book.dat文件，并在屏幕显示：
+ID is:100032
+name is:Java Programming Skills
+author is:Wang Sir
+price is:30.0
+说明
+如果希望增加Book类的功能，使其还能够具有借书方法borrowBook，并保存借书人的借书号borrowerID，可对Book类添加如下内容：
+transient int borrowerID;
+public void borrowBook(int ID){
+	this.borrowerID=ID;
+}
+
+6.2.7 对象序列化(续)	  		——例6_17修改
+在main方法中创建了Book类的一个对象后，紧接着调用borrowBook方法
+book.borrowBook(2018);
+从读入的对象中输出borrowerID
+System.out.println("Borrower ID is:"+book.borrowerID);
+运行结果
+显示borrrowID为0，因为声明为transient，所以不保存
+如果去掉transient关键子，则可以正确读出2018。这对于保护比较重要的信息（例如密码等）是很有必要的
+6.2.7 对象序列化(续)	  	——Externalizable接口
+6.2.7 对象序列化(续)	——Thinking in Java c11:Blip3.java
+6.2.7 对象序列化(续)	——Thinking in Java c11:Blip3.java
+public void writeExternal(ObjectOutput out) throws IOException{
+     System.out.println("Blip3.writeExternal");
+     // You must do this:
+     out.writeObject(s); 
+     out.writeInt(i);
+  }
+
+public void readExternal(ObjectInput in)
+       throws IOException, ClassNotFoundException {
+    System.out.println("Blip3.readExternal");
+    // You must do this:
+    s = (String)in.readObject(); 
+    i =in.readInt();
+  }
+  
+6.2.7 对象序列化(续)	——Thinking in Java c11:Blip3.java
+public static void main(String[] args)
+  throws IOException, ClassNotFoundException {
+    System.out.println("Constructing objects:");
+    Blip3 b3 = new Blip3("A String ", 47);
+    System.out.println(b3);
+    ObjectOutputStream o = new ObjectOutputStream(
+                                             new FileOutputStream("Blip3.out"));
+    System.out.println("Saving object:");
+    o.writeObject(b3);
+    o.close();
+    // Now get it back:
+    ObjectInputStream in =  new ObjectInputStream(
+                                             new FileInputStream("Blip3.out"));
+    System.out.println("Recovering b3:");
+    b3 = (Blip3)in.readObject();
+    System.out.println(b3);
+  }
+}
+
+
+6.3 本章小结
+本章内容
+I/O流的概念以及分类
+读写文本文件、二进制文件的方法
+处理流的概念及用法
+File类
+对象序列化的常用流类及接口
+本章要求
+理解I/O流的概念，掌握其分类
+掌握文本文件读写、二进制文件读写、处理流类的概念和用法、对象序列化
+掌握File类
+遇到I/O方面的问题，能够自行查阅API文档解决

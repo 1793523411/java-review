@@ -1,0 +1,413 @@
+第十章 JDBC与数据库访问
+目录
+10.1 数据库基础知识
+10.2 通过JDBC访问数据库
+10.3 本章小结
+10.1 数据库基础知识
+数据管理的两个阶段
+文件管理
+各种数据都是以文件为单位存储在外存，且由操作系统统一管理
+文件相对独立，文件结构不能很好地反映现实世界中事物之间的联系，文件中存在大量的数据冗余
+数据库管理
+以数据为中心组织数据，减少冗余，并提供更高的数据共享能力，由数据库系统进行管理
+程序和数据具有较高的独立性，当数据的逻辑结构改变时，不涉及数据的物理结构，也不影响应用程序，从而降低应用程序研制与维护的费用
+10.1.1 数据库技术的特点
+数据库技术有如下一些特点
+面向企业或部门,以数据为中心组织数据，形成综合性的数据库为各应用共享
+采用一定的数据模型。数据模型不仅要描述数据本身的特点，而且要描述数据之间的联系
+数据冗余小，易修改、易扩充。不同的应用程序根据处理要求，从数据库中获取需要的数据，这样就减少了数据的重复存贮，也便于维护数据的一致性
+程序和数据有较高的独立性。当数据的物理结构和逻辑结构改变时，有可能不影响或较少影响应用程序
+具有良好的用户接口，用户可方便地开发和使用数据库
+对数据进行统一管理和控制，提供了数据的安全性、完整性、以及并发控制
+10.1.1 数据库技术的特点(续)
+应用程序访问数据库的基本模式
+DBMS（数据库管理系统）是数据库的核心软件。数据库系统的各种操作，包括创建数据库对象、检索和修改数据库中的数据，都是通过DBMS实现的
+10.1.2 数据模型
+数据模型
+数据库的逻辑结构
+所有的数据库系统都是基于某种数据模型的
+不同种类的数据库可能支持不同的数据模型
+关系数据库就是因为支持关系模型而得名
+10.1.2 数据模型
+关系模型
+形象地说就是二维表结构，也称之为关系表
+一个关系数据库可以包含多个关系表，关系表是数据库中组织和存储数据的基本单位
+每个表都用于存储面向某个主题的信息。例如：
+学生表存储学生信息
+系表存储各系的信息
+课程表存储课程信息等
+关系表每一行存储一个记录，每一列表示记录的一个属性。设计一个关系表时需要
+为表命名
+设计表的列结构，其中包括列名及列的数据类型
+
+10.1.2 数据模型
+学生表
+由5列组成，每一列表示学生的一个属性
+每个学生都是用学号、姓名、性别、出生年月及所属系的系号等属性来描述，在这些属性上的一组合法取值就对应一个学生记录（表中的一行）
+10.1.3 关系表中的主码与外来码
+主码
+为了保证关系表中没有重复的记录，需要为关系表定义一个主码，作用是唯一标识表中的一个记录
+可以是表中的一列，也可以由几列组合而成
+在建表时如果定义了主码，系统可以对输入该表的数据进行检查，要求主码不能重、也不能空（NULL）
+例如在学生表中
+学号可以作为主码，因为一个学号可以唯一地确定表中的一个学生记录
+由于学生中有重名现象，姓名就不能用来做为主码
+10.1.3 关系表中的主码与外来码(续)
+外来码
+现实世界中事物之间的联系反 映到数据库中就体现为表之间的联系，在关系数据库中，借助“外来码”实现存贮这种联系的信息
+如果一个表中的某一列是另外一个表中的主码，那么该列称之为外来码。
+例如在学生表中，“系号”就是外来码，因为系号是系表的主码，在学生表中设计了“系号”一列，就是为了存储学生和系之间的联系信息
+通过外来码和主码的等值连接将不同表里的相关记录连接在一起，从而实现数据库中相关数据的查找
+可以查询每个学生所在系的信息，也可以查询指定系所包含的学生信息
+10.1.3 关系表中的主码与外来码(续)
+10.1.3关系表中的主码与外来码(续)	——员工信息管理系统（PIMS）的例子
+该数据库中建有
+员工基本信息表（person）
+包括工作证号、姓名、部门编号、职务、工资、学历编号等字段
+工作证号（ID）是该表的主码
+Department列是一个外来码，匹配部门编码表中的DepID主码
+Education列也是一个外来码，匹配学历编码表中的EduID主码
+部门编码表（department）
+保存了部门编号和部门名称
+部门编号（DepID）是主码
+学历编码表（education）
+保存了学历编号和学历名称
+学历编号（EduID）是主码
+10.1.3关系表中的主码与外来码(续)	——员工信息管理系统（PIMS）的例子
+10.1.4 建立一个实例数据库
+建立数据库需要借助于数据库管理系统，不同的数据库管理系统其具体操作方法是不同的，以Windows平台上的一个简单的关系型数据库Access为例，建立一个数据库，为编写Java的数据库访问程序提供一个实例环境
+1．启动Office 的Microsoft Access，选择“新建一个Access数据库选项”，在文件名输入栏中输入“PMS.mdb”。该文件代表一个Access数据库
+
+10.1.4 建立一个实例数据库
+PMS数据库窗口出现在Access主窗口中。在数据库窗口的左侧，列出了常用的7类数据库对象。当选中某对象类后，就可以在右窗口中进行有关该对象的操作，如建立、修改，运行等。7类对象的主要含义分别是：
+表 － 关系表，可以实现的操作包括表的建立、数据的维护、查询等
+查询 － 可以建立一个查询（视图的概念），还可以运行SQL语句
+窗体 － 数据库应用界面，可进行简单数据库应用开发
+报表 － 报表的制作与打印输出
+页 － 可生成基于web页面的数据库应用界面
+宏 － 可定义完成特定任务的操作或操作集
+模块 － 可定义数据库中使用的公共过程与函数 
+10.1.4 建立一个实例数据库
+2 ．在对象栏中选择“表”，再选择“使用设计器创建表”方式，单击工具栏中的“设计”按钮，就会出现表设计窗口。在该窗口中可以定义字段的名称、数据类型、字段说明信息等。分别设计Person表、 Department表、Education表
+10.1.4 建立一个实例数据库
+10.1.4 建立一个实例数据库
+3．建立表之间的联系
+点击主窗口“工具”菜单中的“关系”选项，打开“关系”视图
+用鼠标拖动Education表的EduID属性，拉到Person表的Education属性上，在自动弹出的“编辑关系”对话框中，选择实施参照完整性，点击“创建”按钮
+用同样方法建立Department表中DepID列和Person表中Department列
+10.1.4 建立一个实例数据库
+4 ．为每个表创建数据
+10.1.5 SQL语言简介
+SQL语言
+关系数据库的标准语言，从大型数据库（如Oracle）到微机数据库（如Access）都支持
+可以实现对数据库的各种操作。例如
+表及其他数据库对象的定义
+数据的查询与数据维护
+对数据库进行控制
+是非过程化的语言，只需要告诉数据库做什么，而不需要描述怎么做
+语句都是独立执行的，无上下文联系
+本身不区分大小写
+10.1.5 SQL语言简介(续)					——SQL关键字
+10.1.5 SQL语言简介(续)			  ——SQL语言的读/写操作
+在SQL语言中，对数据库中数据的操作可分为读写两种
+读操作（查询）通过SELECT语句实现，该语句的执行不会改变数据库中的数据
+可以返回一行或多行数据
+也可能没有返回结果（没有查到满足条件的记录）
+涉及到写操作的语句共有3个
+INSERT
+UPDATE
+DELETE
+10.1.5 SQL语言简介(续)					——建表语句
+建表语句
+定义表中各列的名称及数据类型
+有关列的数据类型可参考具体数据库的语法手册
+CREATE TABLE person 
+( id INTEGER PRIMARY KEY,   //定义该列为主码
+  name VARCHAR(10),         //列定义，字符型   
+  department INTEGER,        //列定义，整型
+  occupation VARCHAR(10),
+  salary NUMBER,
+  education INTEGER);
+10.1.5 SQL语言简介(续)					——插入语句
+插入语句
+向指定表插入一条记录，插入的值要与表的定义匹配
+插入一行数据
+INSERT INTO table_name
+VALUES (value1, value2,....)
+插入一行数据在指定的字段上
+INSERT INTO table_name (column1, column2,...)
+VALUES (value1, value2,....)  
+例如在person表中插入一行
+INSERT INTO person         
+VALUES (1, '张三', 1, 'manager', 3500, 5);  
+10.1.5 SQL语言简介(续)					——修改语句
+修改语句
+修改指定记录中某列的值，更新表中原有数据
+其格式为
+UPDATE table_name SET column_name = new_valueWHERE column_name = some_value
+例如：将person表中id号为1的人员的工资修改为3700元
+UPDATE person             
+SET salary = 3700    //指定对哪列进行修改、如何修改
+WHERE id = 1 ;        //选择要修改的行 
+10.1.5 SQL语言简介(续)					——删除语句
+删除语句
+删除表中的指定的数据
+其格式为
+DELETE FROM  table_name WHERE column_name = some_value
+例如删除部门号为4的员工记录
+DELETE FROM person  WHERE department = 4 ;  
+10.1.5 SQL语言简介(续)					——查询语句
+查询语句
+从指定表中取出指定的数据
+SELECT select_list 
+[ INTO new_table ] 
+FROM table_source 
+[ WHERE search_condition ] 
+[ GROUP BY group_by_expression ] 
+[ HAVING search_condition ] 
+[ ORDER BY order_expression [ ASC | DESC ] ]
+10.1.5 SQL语言简介(续)					——查询语句
+例：查询工资大于2000的员工的姓名及职务
+SELECT  *         // “*”号表示输出全部列的值
+FROM person    //指定查询的表，本查询只用到person表
+WHERE salary>2000  ;    //查询条件
+例：查询员工“张三”的学历，输出学历名
+SELECT education.name
+FROM person , education          //该查询用到两个表
+WHERE person.name= '张三' AND person.education =education.eduid ; 
+
+10.2 通过JDBC访问数据库
+JDBC （Java DataBase Connectivity）
+是用于执行SQL语句的Java应用程序接口，由一组用Java语言编写的类与接口组成，是一种底层API 
+使开发人员可以用纯Java语言编写完整的数据库应用程序
+用JDBC写的程序能够自动地将SQL语句传送给几乎任何一种数据库管理系统（DBMS）
+10.2 通过JDBC访问数据库(续)					——JDBC
+JDBC （Java DataBase Connectivity）
+是一种规范，它让各数据库厂商为Java程序员提供标准的数据库访问类和接口，这样就使得独立于DBMS的Java应用开发工具和产品成为可能
+隔离了Java与不同数据库之间的对话，使得 程序员只须写一遍程序就可让它在任何数据库管理系统平台上运行
+使用已有的SQL标准，并支持其它数据库连接标准，如与ODBC之间的桥接
+10.2 通过JDBC访问数据库(续)
+Java程序通过JDBC访问数据库的关系
+10.1.2 通过JDBC访问数据库(续)					    ——ODBC
+ODBC（ OpenDatabaseConnectivity ）
+由微软公司提出，用于在数据库管理系统(DBMS)中存取数据
+是一套用C语言实现的访问数据库的API
+通过ODBC API，应用程序可以存取保存在多种不同数据库管理系统（DBMS）中的数据，而不论每个DBMS使用了何种数据存储格式和编程接口
+对于没有提供JDBC驱动的数据库，从Java程序调用本地的C程序访问数据库会带来一系列安全性、完整性、健壮性等方面的问题，因而通过JDBC-ODBC桥来访问没有提供JDBC接口的数据库是一个常用的方案
+10.1.2 通过JDBC访问数据库(续)				  ——ODBC的结构
+ODBC的结构
+应用程序(Application) ：本身不直接与数据库打交道，主要负责处理并调用ODBC函数，发送对数据库的SQL请求及取得结果
+驱动器管理器(ODBC manager) ：为应用程序装载数据库驱动器
+数据库驱动器(ODBC Drivers) ：实现ODBC的函数调用，提供对特定数据源的SQL请求。
+数据源(Data Sources,数据库) ：由用户想要存取的数据以及与它相关的操作系统、DBMS和用于访问DBMS的网络平台组成。
+访问数据库的模式
+你的程序<--> ODBC管理器<--> ODBC驱动程序 <--> 数据库
+10. 2 通过JDBC访问数据库(续)				  ——ODBC的不足
+ODBC的不足
+是一个C语言实现的API，并不适合在Java中直接使用。从Java程序调用本地的C程序会带来一系列类似安全性、完整性、健壮性的缺点
+完全精确地实现从C代码ODBC到Java API写的ODBC的翻译也并不令人满意。比如，Java没有指针，而ODBC中大量地使用了指针，包括极易出错的无类型指针“void＊”。
+ODBC并不容易学习，它将简单特性和复杂特性混杂在一起，甚至对非常简单的查询都有复杂的选项。而JDBC刚好相反，它保持了简单事物的简单性，但又允许复杂的特性
+10. 2 通过JDBC访问数据库(续)				     ——JDBC API
+JDBC API
+是一组由Java语言编写的类和接口，包含在java.sql和javax.sql两个包中
+java.sql为核心包，这个包包含于J2SE中
+javax.sql包扩展了JDBC API的功能，成为了J2EE的一个基本组成部分
+可分为两个层次
+面向底层的JDBC Driver API
+主要是针对数据库厂商开发数据库底层驱动程序使用
+面向程序员的JDBC API
+10. 2 通过JDBC访问数据库(续)		    ——JDBC API的体系结构
+应用程序通过JDBC API和底层的JDBC Driver API打交道
+10. 2 通过JDBC访问数据库(续)	            ——JDBC的Driver类型
+JDBC的Driver可以分为4种类型
+10. 2 通过JDBC访问数据库(续)	            ——JDBC的Driver类型
+在这四种驱动器中，后两种“纯Java”的驱动器效率更高，也更具有通用性，它们能够充分表现出Java技术的优势，例如可以在applet中自动下载需要的JDBC驱动器
+如果不能得到纯Java的驱动器，则可以使用前两种驱动器作为中间解决方案，因为它们比较容易获得，使用也较普遍。后面的例子就是用JDBC-ODBC Bridge驱动器完成的
+10. 2 通过JDBC访问数据库(续)	            ——JDBC API的任务
+面向程序员的JDBC API可以完成以下主要任务
+首先建立和数据源的连接
+然后向其传送查询和修改等SQL命令
+最后处理数据源返回的SQL执行的结果
+10.2 通过JDBC访问数据库(续)	     ——JDBC API中重要的接口和类
+10. 2 通过JDBC访问数据库(续)	           ——JDBC程序开发步骤
+一个基本的JDBC程序开发包含如下步骤
+设置环境，引入相应的JDBC类
+选择合适的JDBC驱动程序并加载
+分配一个Connection对象
+分配一个Statement对象
+用该Statement对象进行查询等操作
+从返回的ResultSet对象中获取相应的数据
+关闭Connection
+10.2.1  设置环境
+在本机上安装有关数据库软件
+下载相应数据库驱动程序并安装
+在Java程序中引入相应的类和包。任何使用JDBC的源程序都需要引入java.sql包，如必要的时候还需要装载相应的JDBC-ODBC驱动程序的包
+import java.sql.*;
+import sun.jdbc.odbc.JdbcOdbcDriver;
+10.2.1  设置环境(续)	  ——通过JDBC-ODBC桥访问数据库
+通过JDBC-ODBC桥访问数据库
+安装 Java 和 JDBC API
+安装JDK的同时就自动安装了
+安装数据库驱动程序
+安装JDK的同时就自动安装了安装JDBC-ODBC桥驱动程序
+安装 DBMS
+建立一个数据库，并注册数据源
+10.2.1  设置环境(续)				——注册数据源
+1．确定数据源名称和说明。依次进入本机的控制面板——>管理工具——>数据源（ODBC），弹出“ODBC数据源管理器”对话框，单击“系统DSN”选项卡，选择”Add”按钮
+
+10.2.1  设置环境(续)				——注册数据源
+2. 单击“添加”按钮后弹出“创建数据源”对话框，选择“Microsoft AccessDriver”选项。单击“完成”按钮后，弹出“ODBC Microsoft Access安装”对话框，在“数据源名”输入框中填写“PIMS”；在“说明”输入中填写“员工信息管理系统”；单击选择按钮，弹出“选择数据库”对话框，在目录中选定刚刚建好的数据库文件“PMS.mdb”
+10.2.1  设置环境(续)				——注册数据源
+3. 单击“高级”按钮，弹出“设置高级选项”对话框，在“登录名称”文本编辑框中设定登陆名称为“Test”，在“密码”文本编辑框中设定密码为“1234”。依次确定返回到“ODBC 数据源管理器”对话框，这时可以发现“系统数据源”选项中增添了一个新确定的数据源“PIMS”，单击“ODBC Microsoft Access”对话框的“确定”按钮，就完成了数据源的注册
+10.2.2 建立连接                               ——装载驱动器
+接下来要建立和DBMS的连接。包括两个步骤
+装载驱动器，用Class.forName方法显式装载驱动程序，如：Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+以完整的Java类名字符串为参数，装载此类，并返回一个Class对象描述此类
+执行上述代码时将自动创建一个驱动器类的实例，并自动调用驱动器管理器DriverManager类中的RegisterDriver方法来注册它
+这里“sun.jdbc.odbc.JdbcOdbcDriver”是驱动器类的名字，可以从驱动程序的说明文档中得到
+需要注意的是，如果驱动器类有可能不存在，使用此方法就可能会抛出ClassNotFoundException异常，因此需要捕获这个异常：
+try{ Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");}
+catch(ClassNotFoundException e){ System.out.println(e.getMessage);} 
+10.2.2 建立连接(续)                                ——建立连接
+建立与数据库的连接，调用DriverManager.getConnection()方法。例如，我们要连接上一节创建的Access数据库PIMS，语句如下：
+Connection con = DriverManager.getConnection("jdbc:odbc:PIMS", "test","1234");
+将返回与指定数据库建立的连接
+该方法有三个字符串参数
+第一个是JDBC URL，格式为 jdbc：子协议：子名称
+Jdbc表示协议，JDBC URL 中的协议总是 jdbc；
+子协议是驱动器名称；
+子名称是数据库的名称，如果是位于远程服务器上的数据库，则还应该包括网络地址，//主机名：端口/数据库名
+第二个是访问数据库所需的用户名
+第三个是用户密码
+Connection是一个接口，表示与指定数据库的连接
+DriverManager类位于JDBC的管理层，作用于用户和驱动程序之间。它负责跟踪在一个系统中所有可用的JDBC驱动程序，并在数据库和相应驱动程序之间建立连接
+10.2.3 对数据库进行操作
+建立好到数据库的连接后，就可以进行对数据库的操作了，一般包括如下三个步骤
+使用Connection对象创建Statement对象
+使用Statement对象执行SQL命令
+从上一步骤返回的ResultSet对象中提取执行结果
+10.2.3 对数据库进行操作(续)                           ——创建Statement对象
+Connection接口有3个方法可用来创建向数据库发送SQL语句的对象
+createStatement
+创建向数据库发送SQL语句的Statement对象，用于简单的SQL语句
+    Statement stmt = con.createStatement();
+prepareStatement
+创建向数据库发送SQL语句的PreparedStatement对象，用于带有一个或多个参数的SQL语句。在SQL语句执行前，这些参数将被赋值
+prepareCall
+创建向数据库发送SQL语句的CallableStatement对象，用于调用数据库中的存储过程
+10.2.3 对数据库进行操作(续)              ——使用Statement对象执行语句
+Statement 接口提供了三种执行 SQL 语句的方法，使用哪一个方法由 SQL 语句所产生的内容决定
+executeQuery
+用于产生单个结果集的语句，例如 SELECT 语句      
+      ResultSet rs = stmt.executeQuery("Select * From Person"); 
+executeUpdate
+用于执行 INSERT、UPDATE 或 DELETE 语句，以及 CREATE TABLE
+    stmt.executeUpdate("DELETE FROM Person WHERE Name='李四'");
+返回值是一个整数，表示受影响的行数（即更新计数），比如修改了多少行、删除了多少行等。对于 CREATE TABLE 等语句，因不涉及到行的操作，所以executeUpdate的返回值总为零
+Execute
+用于执行返回多个结果集（ResultSet 对象）、多个更新计数或二者组合的语句。例如执行某个已存储过程或动态执行SQL，这时有可能出现多个结果的情况
+10.2.3 对数据库进行操作(续)                             ——提取执行结果
+查询结果作为结果集（ResultSet）对象返回后，我们可以从ResultSet对象中提取结果
+使用next方法
+ResultSet对象中含有检索出来的行，其中有一个指示器，指向当前可操作的行，初始状态下指示器是指向第一行之前
+方法next的功能是将指示器下移一行，所以第一次调用next方法时便将指示器指向第一行，以后每一次对next的成功调用都会将指示器移向下一行
+10.2.3 对数据库进行操作(续)                             ——提取执行结果
+使用getXXX方法
+使用相应类型的getXXX方法可以从当前行指定列中提取不同类型的数据。例如，提取VARCHAR类型数据时就要用getString方法，而提取FLOAT类型数据的方法是getFloat
+允许使用列名或列序号作为getXXX方法的参数
+String s = rs.getString("Name");
+提取当前行Name列中的数据，并把其从SQL的VARCHAR类型转换成Java的String类型，然后赋值给对象s
+String s = rs.getString(2);//提取当前行的第2列数据
+这里的列序号指的是结果集中的列序号，而不是原表中的列序号
+10.2.3 对数据库进行操作(续)                                     ——例10_1
+通过JDBC访问PIMS数据库，进行查询、添加操作 
+import java.sql.*;
+public class ex10_1 {
+	public static void main(String[] args) throws Exception {
+	  String DBDriver="sun.jdbc.odbc.JdbcOdbcDriver";
+	  String connectionStr="jdbc:odbc:PIMS";
+	  Connection con = null;
+	  Statement stmt = null;
+	  ResultSet rs = null;
+	  Class.forName(DBDriver);	 //加载驱动器	        
+      con=DriverManager.getConnection(connectionStr,"Test","1234");
+                                                                                   //连接数据库
+	  stmt=con.createStatement();   //创建Statement对象
+	  rs=stmt.executeQuery("Select * From Person");  //查询表
+	  while(rs.next()) {        //显示所有记录的ID和姓名
+	         System.out.print(rs.getInt("ID")+"  ");
+	         System.out.println(rs.getString("Name")+"  ");
+	  };
+10.2.3 对数据库进行操作(续)                                     ——例10_1
+      stmt.executeUpdate("INSERT INTO Person 
+          VALUES(9,'林时',3,'accountant',2000,4)");  //添加一条记录
+	  System.out.println("添加数据后的信息为");
+	  rs=stmt.executeQuery("Select * From Person");  //查询表格
+	  while(rs.next()) {   //显示
+	       System.out.print(rs.getInt("ID")+"  ");
+	       System.out.println(rs.getString("Name")+"  ");
+	  };
+       stmt.executeUpdate("DELETE FROM Person WHERE Name='林时'");    
+       System.out.println("删除数据后的信息为：");
+	  rs=stmt.executeQuery("Select * From Person"); //查询表格
+	 while(rs.next()) {          //显示
+	      System.out.print(rs.getInt("ID")+"  ");
+	      System.out.println(rs.getString("Name")+"  ");
+	  };
+	  stmt.close();    //关闭语句
+	  con.close();   //关闭连接
+   }
+}
+10.2.3 对数据库进行操作(续)                                ——例10_1运行结果
+执行结果为
+1  张三
+2  李四
+3  王五
+4  韩六
+添加数据后的信息为：
+1  张三
+2  李四
+3  王五
+4  韩六
+9  林时
+删除数据后的信息为：
+1  张三
+2  李四
+3  王五
+4  韩六
+可见数据库中的确是先增加了一条记录，后又删除了一条记录
+10.2.3 对数据库进行操作(续)                                     ——例10_2
+建立员工信息输入与统计界面，实现一个图形用户界面的数据库应用程序
+按“员工登记”按钮后弹出的员工记录录入界面 
+菜单“选项”包括“员工登记”和“员工统计”两个菜单项。点击“员工统计”将显示出当前员工数
+10.2.4 执行带参数的SQL语句
+JDBC支持带参数的SQL语句的执行，这给SQL语句的执行带来很大的灵活性
+使用该功能时不能使用Statement类对象，必须利用PreparedStatement类对象
+10.2.4 执行带参数的SQL语句(续)                                     ——例10_3
+import java.sql.*;
+public class Ex10_3 {
+	public static void main(String[] args) throws Exception {
+	  String DBDriver="sun.jdbc.odbc.JdbcOdbcDriver";
+	  String connectionStr="jdbc:odbc:PIMS";
+	  Class.forName(DBDriver);
+	  Connection con=DriverManager.getConnection(connectionStr,"Test","1234");
+       String sq = " UPDATE person SET salary=? WHERE name=? ";
+                                                                      //设置了2个参数
+        PreparedStatement pstmt=con. prepareStatement(sq) ; 
+        pstmt.setInt(1,5000);   
+                               //为第1个参数赋值，根据参数类型的不同调用不同方法
+        pstmt.setString(2,"张三") ;  //为第2个参数赋值
+        pstmt.executeUpdate() ;   //执行SQL语句
+	  pstmt.close();    //关闭语句
+	  con.close();   //关闭连接
+     }
+}
+10.3 本章小结
+本章内容
+数据库的基本概念
+基本SQL语句的使用
+Java程序中如何实现对数据库的操作
+本章要求
+了解关系型数据库和SQL的基本概念
+了解JDBC和ODBC访问数据库的机制
+熟悉通过JDBC访问数据库的编程实现

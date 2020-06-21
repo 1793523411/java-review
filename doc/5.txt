@@ -1,0 +1,692 @@
+第5章  接口与多态
+目录
+5.1 接口
+5.2 塑型
+5.3 多态的概念
+5.4 多态的应用
+5.5 构造方法与多态
+5.6 本章小结
+5.1 接口
+接口
+与抽象类一样都是定义多个类的共同属性
+使抽象的概念更深入了一层，是一个“纯”抽象类，它只提供一种形式，并不提供实现
+允许创建者规定方法的基本形式：方法名、参数列表以及返回类型，但不规定方法主体
+也可以包含基本数据类型的数据成员，但它们都默认为static和final
+5.1.1 接口的作用及语法
+接口的作用
+是面向对象的一个重要机制
+实现多继承，同时免除C++中的多继承那样的复杂性
+建立类和类之间的“协议”
+把类根据其实现的功能来分别代表，而不必顾虑它所在的类继承层次；这样可以最大限度地利用动态绑定，隐藏实现细节
+实现不同类之间的常量共享
+5.1.1 接口的作用及语法			——与抽象类的不同
+接口允许我们在看起来不相干的对象之间定义共同行为
+5.1.1 接口的作用及语法					——例5_1
+保险公司的例子
+具有车辆保险、人员保险、公司保险等多种保险业务，在对外提供服务方面具有相似性，如都需要计算保险费(premium)等，因此可声明一个Insurable 接口
+在UML图中，实现接口用带有空三角形的虚线表示
+5.1.1 接口的作用及语法
+接口的语法
+声明格式为
+[接口修饰符] interface 接口名称 [extends 父接口名]{
+…//方法的原型声明或静态常量
+}
+接口的数据成员一定要赋初值，且此值将不能再更改，允许省略final关键字
+接口中的方法必须是“抽象方法”，不能有方法体，允许省略public及abstract关键字
+5.1.1 接口的作用及语法	  ——例5_1保险接口的声明
+例5.1中的Insurable 接口声明如下，可见其中的方法都是抽象方法
+ public interface Insurable    {
+     public int getNumber(); 
+     public int getCoverageAmount(); 
+     public double calculatePremium(); 
+     public Date getExpiryDate(); 
+ }
+5.1.1 接口的作用及语法					——例5_2
+声明一个接口Shape2D，可利用它来实现二维的几何形状类Circle和Rectangle
+把计算面积的方法声明在接口里
+pi值是常量，把它声明在接口的数据成员里
+interface Shape2D{　　　      //声明Shape2D接口
+    final double pi=3.14;　　   //数据成员一定要初始化
+    public abstract double area();　//抽象方法
+}
+在接口的声明中，允许省略一些关键字，也可声明如下
+interface Shape2D{           
+   double pi=3.14;            
+   double area();             
+}
+5.1.2 实现接口
+接口的实现
+接口不能用new运算符直接产生对象，必须利用其特性设计新的类，再用新类来创建对象
+利用接口设计类的过程，称为接口的实现，使用implements关键字
+语法如下
+public class 类名称 implements 接口名称 { 
+        /* Bodies for the interface methods */ 
+        /* Own data and methods. */ 
+}
+必须实现接口中的所有方法
+来自接口的方法必须声明成public
+5.1.2 实现接口					                  ——例5_3
+实现接口Insurable，声明汽车类实现例5.1中的Insurable接口，实现接口中的所有抽象方法
+public class Car implements Insurable { 
+         public int getPolicyNumber() { 
+           // write code here 
+         } 
+         public double calculatePremium() { 
+            // write code here 
+          } 
+         public Date getExpiryDate() { 
+            // write code here 
+          } 
+         public int getCoverageAmount() { 
+            // write code here 
+          } 
+         public int getMileage() {  //新添加的方法
+            //write code here
+         }
+   }
+
+对象可以被转型为其所属类实现的接口类型
+getPolicyNumber、calculatePremium是Insurable接口中声明的方法
+getMileage是Car类新添加的方法，Insurable接口中没有声明此方法
+Car  jetta = new Car(); 
+Insurable  item = (Insurable)jetta;   //对象转型为接口类型 
+item.getPolicyNumber();
+item.calculatePremium(); 
+item.getMileage();           // 接口中没有声明此方法，不可以
+jetta.getMileage();           // 类中有此方法，可以
+((Car)item).getMileage(); // 转型回原类，可调用此方法了
+
+5.1.2 实现接口					                  ——例5_4
+class Circle implements Shape2D
+{
+    double radius;
+    public Circle(double r)
+    {
+       radius=r;
+    }
+    public double area()      
+   {
+       return (pi * radius * radius);
+   }
+}
+class Rectangle implements Shape2D
+{
+     int width,height;
+     public Rectangle(int w,int h) 
+     {
+         width=w;
+         height=h;
+      }
+      public double area()
+      {
+         return (width * height);
+       }
+    }
+
+5.1.2 实现接口					              ——例5_4运行结果
+测试类
+public class InterfaceTester {
+   public static void main(String  args[]){
+      Rectangle rect=new Rectangle(5,6);
+      System.out.println("Area of rect = " + rect.area());
+      Circle cir=new Circle(2.0);
+      System.out.println("Area of cir = " + cir.area());
+   }
+}
+运行结果
+Area of rect = 30.0
+Area of cir = 12.56
+5.1.2 实现接口					                  ——例5_5
+声明接口类型的变量，并用它来访问对象
+public class VariableTester {
+	public static void main(String []args)
+	{
+	  Shape2D var1,var2;		
+		var1=new  Rectangle(5,6);
+		System.out.println("Area of var1 = " + var1.area());
+		var2=new Circle(2.0);	
+		System.out.println("Area of var2 = " + var2.area());
+	}
+}
+输出结果
+Area of var1 = 30.0
+Area of var2 = 12.56
+
+5.1.2 实现接口					         ——MovableObject接口
+MovableObject接口定义了所有“可移动对象”能做的事情
+public interface  MovableObject { 
+   public boolean    start(); public void          stop(); public boolean    turn(int degrees); public double      fuelRemaining(); public void          changeSpeed(double kmPerHour);
+}
+5.1.2 实现接口					  ——MovableObject接口的实现
+Plane、Car、 Train、 Boat 分别实现 MovableObject 接口
+public class Plane implements  MovableObject { 
+   public int   seatCapacity; 
+   public Company  owner; 
+   public Date  lastRepairDate; 
+  //实现MovalbelObject接口的所有方法
+   public boolean start() {  //启动飞机，成功则返回true  } 
+   public void stop() {  //停止  } 
+   public boolean turn(int degrees) { //转向，成功则返回true} 
+   public double fuelRemaining() {  //返回燃料剩余量  } 
+   public void changeSpeed(double kmPerHour)  {  //改变速度  }
+   //plane类自己的方法： 
+   public Date getLastRepairDate() {   //...   } 
+   public double calculateWindResistance() {  //....} 
+}
+5.1.2 实现接口					  		——RemoteControl类
+为 MovableObjects安装遥控器(remote control)
+public class RemoteControl {   private MovableObject   machine;     
+      RemoteControl(MovableObject m) {machine = m; }   //按下“启动”按钮：   public void start()
+      {
+           boolean okay = machine.start();        if (!okay) display("No Response on start");        //...    }
+  }
+remote control 构造方法的形参类型为 MovableObject，它可以是Plane, Car, Train, Boat,  等等
+5.1.3 多重继承
+多重继承
+Java的设计以简单实用为导向，不允许一个类有多个父类
+但允许一个类可以实现多个接口，通过这种机制可实现多重继承
+一个类实现多个接口的语法如下
+[类修饰符] class  类名称  implements 接口1,接口2,  …
+{
+… …
+}
+
+5.1.3 多重继承					  			——Car的例子
+Car类可以实现接口Insurable，Drivable，Sellable
+public class Car implements Insurable, Drivable, Sellable
+ {    .... 
+ }
+5.1.3 多重继承					  			——例5_6
+声明Circle类实现接口Shape2D和Color
+Shape2D具有pi与area()方法，用来计算面积
+Color则具有setColor方法，可用来赋值颜色
+通过实现这两个接口，Circle类得以同时拥有这两个接口的成员，达到了多重继承的目的
+interface Shape2D{          //声明Shape2D接口
+  final double pi=3.14;     //数据成员一定要初始化
+  public abstract double area();    //抽象方法
+}
+interface Color{
+    void setColor(String str);  //抽象方法
+}
+
+5.1.3 多重继承					  			——例5_6
+class Circle implements Shape2D,Color   // 实现Circle类
+{
+   double radius;
+   String color;
+   public Circle(double r)             //构造方法
+   {
+      radius=r;
+   }
+   public double area()                //定义area()的处理方式
+   {
+      return (pi*radius*radius);
+   }
+   public void setColor(String str)  //定义setColor()的处理方式
+   {
+      color=str;
+      System.out.println("color="+color);      
+   }
+}
+5.1.3 多重继承					  		  ——例5_6运行结果
+测试类
+public class MultiInterfaceTester{
+  public static void main(String args[]) {
+     Circle cir;
+     cir=new Circle(2.0);
+     cir.setColor("blue");
+     System.out.println("Area = " + cir.area());
+  }
+}
+输出结果
+color=blue
+Area = 12.56
+5.1.4 接口的扩展
+接口的扩展
+接口可通过扩展的技术派生出新的接口
+原来的接口称为基本接口(base interface)或父接口(super interface)
+派生出的接口称为派生接口(derived interface)或子接口(sub interface)
+派生接口不仅可以保有父接口的成员，同时也可加入新成员以满足实际问题的需要
+实现接口的类也必须实现此接口的父接口
+接口扩展的语法
+interface 子接口的名称 extends 父接口的名称1，父接口的名称2，…
+{
+  … …
+}
+
+5.1.4 接口的扩展					  			——例5_7
+Shape是父接口，Shape2D与Shape3D是其子接口。Circle类及Rectangle类实现接口Shape2D，而Box类及Sphere类实现接口Shape3D 
+5.1.4 接口的扩展					  			——例5_7
+部分代码如下
+// 声明Shape接口
+interface Shape{             
+  double pi=3.14;            
+  void setColor(String str); 
+}
+//声明Shape2D接口扩展了Shape接口
+interface Shape2D extends Shape {
+    double area();
+}
+5.1.4 接口的扩展					  			——例5_7
+class Circle implements Shape2D {
+    double radius;
+    String color;
+    public Circle(double r) {   radius=r;  }
+    public double area() {
+       return (pi*radius*radius);
+     }
+    public void setColor(String str){
+       color=str;
+       System.out.println("color="+color);
+    }
+}
+public class ExtendsInterfaceTester{   //测试类
+  public static void main(String []args) {
+     Circle cir;
+     cir=new Circle(2.0);
+     cir.setColor("blue");
+     System.out.println("Area = " + cir.area());
+  }
+}
+
+
+5.1.4 接口的扩展					        ——例5_7运行结果
+运行结果
+color=blue
+Area = 12.56
+说明
+首先声明了父接口Shape，然后声明其子接口Shape2D
+之后声明类Circle实现Shape2D子接口，因而在此类内必须明确定义setColor()与area()方法的处理方式
+最后在主类中我们声明了Circle类型的变量cir并创建新的对象，最后通过cir对象调用setColor()与area()方法
+
+5.1.4 接口的扩展					  ——Insurable接口的例子
+FixedInsurable 和DepreciatingInsurable接口
+都继承了Insurable接口
+实现它们类也必须实现Insurable接口中的所有方法
+public interface DepreciatingInsurable extends  Insurable {     public double computeFairMarketValue(); 
+} 
+public interface FixedInsurable extends  Insurable {     public int getEvaluationPeriod();
+}
+5.2 塑型
+塑型(type-casting)
+又称为类型转换
+方式
+隐式(自动)的类型转换
+显式(强制)的类型转换
+5.2.1 塑型的概念
+塑型的对象包括
+基本数据类型
+将值从一种形式转换成另一种形式
+引用变量
+将对象暂时当成更一般的对象来对待，并不改变其类型
+只能被塑型为
+任何一个父类类型
+对象所属的类实现的一个接口
+被塑型为父类或接口后，再被塑型回其本身所在的类
+5.2.1 塑型的概念					 		 ——一个例子
+Manager对象
+可以被塑型为Employee、Person、Object或Insurable，
+不能被塑型为Customer、Company或Car 
+5.2.1 塑型的概念					 ——隐式(自动)的类型转换
+基本数据类型
+相容类型之间存储容量低的自动向存储容量高的类型转换
+引用变量
+被塑型成更一般的类
+Employee  emp; 
+emp = new Manager(); //将Manager类型的对象直接赋给
+                                     //Employee类的引用变量，系统会                                   
+                                     //自动将Manage对象塑型为Employee类
+被塑型为对象所属类实现的接口类型
+Car  jetta = new Car(); 
+Insurable  item = jetta; 
+5.2.1 塑型的概念					 ——显式(强制)的类型转换
+基本数据类型
+(int)871.34354;     // 结果为 871 
+(char)65;              // 结果为‘A’ 
+(long)453;            // 结果为453L
+引用变量：还原为本来的类型
+Employee  emp; 
+Manager man;
+emp = new Manager();
+man = (Manager)emp; //将emp强制塑型为本来的类型
+5.2.2 塑型的应用
+塑型应用的场合包括
+赋值转换
+赋值号右边的表达式类型或对象转换为左边的类型
+方法调用转换
+实参的类型转换为形参的类型
+算数表达式转换
+算数混合运算时，不同类型的项转换为相同的类型再进行运算
+字符串转换
+字符串连接运算时，如果一个操作数为字符串，一个操作数为数值型，则会自动将数值型转换为字符串 
+5.2.2 塑型的应用
+当一个类对象被塑型为其父类后，它提供的方法会减少
+当Manager对象被塑型为Employee之后，它只能接收getName()及getEmployeeNumber()方法，不能接收getSalary()方法
+将其塑型为本来的类型后，又能接收getSalary()方法了
+5.2.3 方法的查找
+如果在塑型前和塑型后的类中都提供了相同的方法，如果将此方法发送给塑型后的对象，那么系统将会调用哪一个类中的方法？
+实例方法的查找
+类方法的查找
+5.2.3 方法的查找						 ——实例方法的查找
+从对象创建时的类开始，沿类层次向上查找 
+5.2.3 方法的查找						 	——类方法的查找
+总是在引用变量声明时所属的类中进行查找 
+5.3 多态的概念
+多态
+是指不同类型的对象可以响应相同的消息
+从相同的基类派生出来的多个类型可被当作同一种类型对待，可对这些不同的类型进行同样的处理，由于多态性，这些不同派生类对象响应同一方法时的行为是有所差别的 
+例如
+所有的Object类的对象都响应toString()方法
+所有的BankAccount类的对象都响应deposit()方法
+5.3.1 多态的目的
+多态的目的
+所有的对象都可被塑型为相同的类型，响应相同的消息
+使代码变得简单且容易理解
+使程序具有很好的“扩展性”
+
+
+
+5.3.1 多态的目的						 	——一个例子
+绘图——直接的方式
+希望能够画出任意子类型对象的形状，可以在Shape 类中声明几个绘图方法，对不同的实际对象，采用不同的画法
+if (aShape instanceof Circle)     aShape.drawCircle(); 
+if (aShape instanceof Triangle) aShape.drawTriangle(); 
+if (aShape instanceof Rectangle)aShape.drawRectangle();
+
+5.3.1 多态的目的						 	——一个例子
+绘图——更好的方式
+在每个子类中都声明同名的draw()方法
+以后绘图可如下进行
+Shape s = new Circle(); 
+s.draw(); 
+Circle属于Shape的一种，系统会执行自动塑型
+当调用方法draw时，实际调用的是Circle.draw()
+在程序运行时才进行绑定，接下来介绍绑定的概念
+5.3.2 绑定的概念
+绑定
+指将一个方法调用同一个方法主体连接到一起
+根据绑定时期的不同，可分为
+早期绑定
+程序运行之前执行绑定
+晚期绑定
+也叫作“动态绑定”或“运行期绑定
+基于对象的类别，在程序运行时执行绑定
+5.3.2 绑定的概念						 		——例5_8
+仍以绘图为例，所有类都放在binding包中
+基类Shape建立了一个通用接口
+class Shape { 
+    void draw()    {} 
+    void erase()   {} 
+} 
+派生类覆盖了draw方法，为每种特殊的几何形状都提供独一无二的行为
+class Circle extends Shape { 
+	void draw() 
+      { System.out.println("Circle.draw()"); } 
+	void erase() 
+      { System.out.println("Circle.erase()"); } 
+}
+5.3.2 绑定的概念						 		——例5_8
+class Square extends Shape { 
+	void draw() 
+      { System.out.println("Square.draw()"); }
+	void erase() 
+      { System.out.println("Square.erase()"); } 
+} 
+class Triangle extends Shape { 
+	void draw() 
+      { System.out.println("Triangle.draw()"); } 
+   void erase() 
+      { System.out.println("Triangle.erase()"); }
+ } 
+
+5.3.2 绑定的概念						 		——例5_8
+对动态绑定进行测试如下
+public class BindingTester{ 
+    public static void main(String[] args) { 
+       Shape[] s = new Shape[9]; 
+       int n;
+       for(int i = 0; i < s.length; i++) { 
+            n = (int)(Math.random() * 3);
+            switch(n) {  
+                case 0: s[i] =  new Circle(); break;
+                case 1: s[i] =  new Square(); break;
+                case 2: s[i] =  new Triangle();
+             } 
+        }      
+        for(int i = 0; i < s.length; i++)   s[i].draw(); 
+      }
+}
+5.3.2 绑定的概念						 ——例5_8运行结果
+运行结果
+Square.draw()
+Triangle.draw()
+Circle.draw()
+Triangle.draw()
+Triangle.draw()
+Circle.draw()
+Square.draw()
+Circle.draw()
+Triangle.draw()
+说明
+编译时无法知道s数组元素的具体类型，运行时才能确定类型，所以是动态绑定
+在主方法的循环体中，每次随机生成指向一个Circle、Square或者Triangle的引用
+5.3.2 绑定的概念						 ——music的例子
+所有类都在music包中
+Note类中定义了三个音符
+Instrument类中声明并实现了一个play方法
+Wind类继承了Instrument类，重载了play方法
+Music类中包含了main方法
+class Note {
+  private int value;
+  private Note(int val) { value = val; }
+  public static final Note
+    MIDDLE_C = new Note(0), 
+    C_SHARP  = new Note(1),
+    B_FLAT   = new Note(2);
+} 
+5.3.2 绑定的概念(续)						——music的例子
+class Instrument {
+  public void play(Note n) {
+    System.out.println("Instrument.play()");
+  }
+}
+
+class Wind extends Instrument {
+  public void play(Note n) {
+    System.out.println("Wind.play()");
+  }
+}
+5.3.2 绑定的概念(续)					——music运行结果
+public class Music {
+  public static void tune(Instrument i) {
+      i.play(Note.MIDDLE_C);
+  }
+  public static void main(String[] args) {
+    Wind flute = new Wind();
+    tune(flute); 
+  }
+} 
+运行结果
+Wind.play()
+说明
+运行中，Instrument类的对象实际是Wind类的，所以调用了Wind类中的play方法
+5.4 多态的应用 
+多态的应用
+技术基础
+向上塑型技术：一个父类的引用变量可以指向不同的子类对象
+动态绑定技术：运行时根据父类引用变量所指对象的实际类型执行相应的子类方法，从而实现多态性
+5.4 多态的应用(续)							——例5_9
+声明一个抽象类Driver及两个子类FemaleDriver及MaleDriver
+在Diver类中声明了抽象方法drives，在两个子类中对这个方法进行了重写
+public abstract class Driver
+{
+	public Driver( ) { }
+	public abstract void drives( );
+}
+5.4 多态的应用(续)							——例5_9
+public class FemaleDriver extends Driver {
+	public FemaleDriver( ) { }
+	public void drives( ) { 
+       System.out.println("A Female driver drives a vehicle."); 
+     }
+}
+public class MaleDriver extends Driver {
+	public MaleDriver( ) { }
+	public void drives( ) { 
+       System.out.println("A male driver drives a vehicle."); 
+    }
+}
+5.4 多态的应用(续)							——例5_9
+public class Test1
+{
+	static public void main(String [ ] args)
+	{
+		    Driver a = new FemaleDriver( );
+	      Driver b = new MaleDriver( );
+	      a.drives( );
+          b.drives( );
+	 }
+ }
+运行结果
+A Female driver drives a vehicle.
+A male driver drives a vehicle.
+
+
+5.5 构造方法与多态
+构造方法与多态
+构造方法与其他方法是有区别的
+构造方法并不具有多态性，但仍然非常有必要理解构造方法如何在复杂的分级结构中随同多态性一同使用的情况
+
+5.5.1 构造方法的调用顺序
+构造方法的调用顺序
+调用基类的构造方法。这个步骤会不断重复下去，首先得到构建的是分级结构的根部，然后是下一个派生类，等等。直到抵达最深一层的派生类
+按声明顺序调用成员初始化模块
+调用派生构造方法
+5.5.1 构造方法的调用顺序(续)				    ——例5_10
+构建一个点类Point，一个球类Ball，一个运动的球类MovingBall继承自Ball
+public class Point {
+	private double xCoordinate;
+	private double yCoordinate;
+	public Point ( ) { }
+	public Point(double x, double y) {
+	    xCoordinate = x;
+	    yCoordinate = y;
+	}
+	public String toString( )	{
+	    return "(" + Double.toString(xCoordinate) + ", " 
+             + Double.toString(yCoordinate) + ")";
+	}
+}
+5.5.1 构造方法的调用顺序(续)				    ——例5_10
+public class Ball {
+	private Point center;     //中心点
+	private double radius;    //半径
+	private String colour;    //颜色
+	public Ball( ) { } 
+	public Ball(double xValue, double yValue, double r) {
+	   center = new Point(xValue, yValue); //调用Point中的构造方法
+	   radius = r;
+	}		
+	public Ball(double xValue, double yValue, double r, String c) {
+	   this(xValue, yValue, r); // 调用三个参数的构造方法
+	   colour = c;
+	}
+	public String toString( ) {
+	   return "A ball with center " + center.toString( ) + ", radius " 
+	       + Double.toString(radius) + ", colour " + colour;	
+	}
+}
+5.5.1 构造方法的调用顺序(续)				    ——例5_10
+public class MovingBall extends Ball {
+	private double speed;
+	public MovingBall( ) { }
+	public MovingBall(double xValue, double yValue, double r, String c, double s) {
+	  super(xValue, yValue, r, c); 
+	  speed = s;
+	}
+	public String toString( ) { 
+        return super.toString( ) + ", speed " + Double.toString(speed); 
+    }
+}
+子类不能直接存取父类中声明的私有数据成员，super.toString调用父类Ball的toString方法输出类Ball中声明的属性值
+5.5.1 构造方法的调用顺序(续)		        ——例5_10运行结果
+public class Tester{
+	public static void main(String args[]){
+	MovingBall mb = new MovingBall(10,20,40,"green",25);
+	System.out.println(mb);
+	}
+}
+运行结果
+A ball with center (10.0, 20.0), radius 40.0, colour green, 
+speed 25.0
+5.5.1 构造方法的调用顺序(续)		            ——例5_10说明
+上面的代码中，构造方法调用的顺序为
+MovingBall(double xValue, double yValue, double r, String c, double s)
+
+Ball(double xValue, double yValue, double r, String c)
+
+Ball(double xValue, double yValue, double r)
+
+Point(double x, double y)
+5.5.1 构造方法的调用顺序(续)				    ——例5_11
+构造方法的调用顺序举例2
+class Meal { //饭类
+  Meal() { System.out.println("Meal()"); }
+}
+class Bread { //面包类
+  Bread() { System.out.println("Bread()"); }
+}
+class Cheese { //奶酪类
+  Cheese() { System.out.println("Cheese()"); }
+}
+class Lettuce { //莴苣类
+  Lettuce() { System.out.println("Lettuce()"); }
+}
+5.5.1 构造方法的调用顺序(续)				    ——例5_11
+class Lunch extends Meal {  //午餐类继承自饭类
+  Lunch() {System.out.println("Lunch()");}
+}
+class PortableLunch extends Lunch { 
+  PortableLunch() { System.out.println("PortableLunch()"); }
+}
+public class Sandwich extends PortableLunch { 
+  Bread b = new Bread();
+  Cheese c = new Cheese();
+  Lettuce l = new Lettuce();
+  Sandwich(){System.out.println("Sandwich()");}
+  public static void main(String[] args) {  new Sandwich();  }
+}
+5.5.1 构造方法的调用顺序(续)		        ——例5_11运行结果
+输出结果
+Meal()
+Lunch()
+PortableLunch()
+Bread()
+Cheese()
+Lettuce()
+Sandwich() 
+说明
+当我们在构造派生类的时候，必须能假定基类的所有成员都是有效的。在构造方法内部，必须保证使用的所有成员都已初始化。因此唯一的办法就是首先调用基类构造方法，然后在进入派生类构造方法之前，初始化所有能够访问的成员
+
+
+5.5.2 构造方法中的多态方法
+构造方法中的多态方法
+在构造方法内调用准备构造的那个对象的动态绑定方法
+会调用位于派生类里的一个方法
+被调用方法要操纵的成员可能尚未得到正确的初始化
+可能造成一些难于发现的程序错误
+5.5.2 构造方法中的多态方法
+定义构造方法的注意事项
+用尽可能少的动作把对象的状态设置好
+如果可以避免，不要调用任何方法
+在构造方法内唯一能够安全调用的是在基类中具有final属性的那些方法（也适用于private方法，它们自动具有final属性）。这些方法不能被覆盖，所以不会出现上述潜在的问题
+
+5.6 本章小结
+本章内容
+接口作用及语法
+塑型的概念及应用
+多态的概念及引用
+构造方法的调用顺序及其中的多态方法
+本章要求
+理解接口、塑型、多态的概念并能熟练应用
+熟练掌握构造方法的调用顺序，理解编写时需要注意的问题

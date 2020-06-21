@@ -1,0 +1,200 @@
+第9章 组件及事件处理 
+导读
+§9.1   Java Swing概述
+通过图形用户界面（GUI：Graphics User Interface），用户和程序之间可以方便地进行交互。Java的Swing工具包中包含了许多类来支持GUI设计。如：按钮、菜单、列表、文本框等组件类，同时它还包含窗口、面板等容器类。
+§9.1   Java Swing概述
+javax.swing包提供了功能更为强大的用来设计GUI的类。java.awt和javax.swing包中一部分类的层次关系的UML类图如图9.1。 
+§9.1   Java Swing概述
+在学习GUI编程时，必须要很好的掌握两个概念：容器类和组件类。
+javax.swing包中JComponent类是java.awt包中Container类的一个直接子类、是java.awt包中Component类的一个间接子类，学习GUI编程主要是学习掌握使用Component类的一些重要的子类及其使用方法。
+以下是GUI编程经常提到的基本知识点 。
+	(1)Java把Component类的子类或间接子类创建的对象称为一个组件.
+	(2)Java把Container的子类或间接子类创建的对象称为一个容器.
+	(3)可以向容器添加组件。Container类提供了一个public方法：add( )，一个容器可以调用这个方法将组件添加到该容器中。
+
+§9.1   Java Swing概述
+(4)容器调用removeAll()方法可以移掉容器中的全部组件；调用remove(Component c)方法可以移掉容器中参数c指定的组件。
+(5)注意到容器本身也是一个组件，因此可以把一个容器添加到另一个容器中实现容器的嵌套。
+(6)每当容器添加新的组件或移掉组件时，应当让容器调用validate()方法，以保证容器中的组件能正确显示出来
+如：
+    JFrame f=new JFrame();
+    JButton  button=new JButton("确定")
+    f.add(button);
+    …….
+    f.remove(button);
+§9.2   窗口
+Java提供的JFrame类的实例是一个底层容器，即通常所称的窗口。其他组件必须被添加到底层容器中，以便借助这个地层容器和操作系统进行信息交互。 
+JFrame类是Container类的间接子类。当需要一个窗口时，可使用JFrame或其子类创建一个对象。
+窗口也是一个容器，可以向窗口添加组件。需要注意的是，窗口默认地被系统添加到显示器屏幕上，因此不允许将一个窗口添加到另一个容器中。
+§9.2.1    JFrame常用方法
+JFrame构造方法:
+  	   JFrame() 创建一个无标题的窗口。
+	   JFrame(String s) 创建标题为s的窗口。
+常用方法:
+	1)public void setBounds(int a,int b,int width,int height 设置窗口的初始位置是(a,b)，即距屏幕左面a个像素、距屏幕上方b个像素；窗口的宽是width，高是height。
+	2)public void setSize(int width,int height) 设置窗口的大小。
+	3)public void setLocation(int x,int y) 设置窗口的位置，默认位置是(0,0)。
+	4)public void setVisible(boolean b) 设置窗口是否可见，窗口默认是不可见的。
+	5)public void setResizable(boolean b) 设置窗口是否可调整大小，默认可调整大小。
+	6)public void dispose() 撤消当前窗口，并释放当前窗口所使用的资源。
+
+
+§9.2.1    JFrame常用方法
+7)public void setExtendedState(int state) 设置窗口的扩展状态.
+8)public void setDefaultCloseOperation(int operation)  该方法用来设置单击窗体右上角的关闭图标后，程序会做出怎样的处理。如：EXIT_ON_CLOSE
+9)public void setLayout(LayoutManager mgr) 设置此容器的布局管理器。
+10)public Component add(Component comp) 将指定组件追加到此容器的尾部。
+11)public void setMenuBar(MenuBar mb) 将此 frame 的菜单栏设置为指定的菜单栏。
+12)public void validate() 使用 validate 方法会使容器再次布置其子组件。在修改此容器的子组件的时候（在容器中添加或移除组件，或者更改与布局相关的信息），应该调用上述方法。
+§9.2.2  菜单条、菜单、菜单项
+§9. 3  常用组件与布局
+可以使用JComponent的子类JTextField创建各种组件。利用组件可以完成应用程序与用户的交互及事件处理等。
+也可以在命令行窗口反编译组件即时查看组件所具有的属性及常用方法，例如：
+          C:\>javap javax.swing.JComponent
+也可以查看类库帮助文档.例如下载Java类库帮助文档：jdk-6-doc.zip。
+§9.3.1    常用组件
+1．文本框：由JComponent的子类JTextField创建文本框。
+构造函数：JTextField( ) ; JTextField(int columns) ;
+常用方法：public String getText();
+                    public void setText(String t);
+2．文本区：由JComponent的子类JTexArea创建文本区。
+构造函数：JTextArea() ;JTextArea(int rows, int columns) 
+常用方法：public String getText();
+                    public void setText(String t);
+3．按钮：由JComponent的子类JButton类用来创建按钮。
+构造函数：JButton() ; JButton(String text) ;
+常用方法：public void addActionListener(ActionListener l);
+
+§9.3.1    常用组件
+4.标签：由JComponent的子类JLabel类用来创建标签。
+构造函数：JLabel() ; JLabel(String text) ; JLabel(Icon image) ;
+常用方法：public String getText();	
+                    public void setText(String t);
+5.选择框：由JComponent的子类JCheckBox类用来创建选择框
+构造函数： JCheckBox() ;JCheckBox(String text) ;
+常用方法： public void addItemListener(ItemListener l) 
+                     public void addActionListener(ActionListener l) 
+ItemListener接口中：Object getItemSelectable()相当于getSource();
+                                public int getStateChange();
+                                若被选中SELECTED/DESEELCTED
+6.单选按钮：由JComponent的子类JRadioButton类用来创建单项选择框。
+构造函数： JRadioButton() ; JRadioButton(String text) ;
+常用方法： public void addItemListener(ItemListener l)
+
+§9.3.1    常用组件
+7.下拉列表：由JComponent的子类JComboBox类用来创建下拉列表。
+构造函数：JComboBox() ; JComboBox(Object[] items) 
+常用方法： public void addItemListener(ItemListener l)	
+                    public Object getSelectedItem();
+                    public int getSelectedIndex()
+8.密码框：由JComponent的子类JPasswordField创建密码框.
+构造函数：JPasswordField() ; JPasswordField(int columns) 
+常用方法：public String getText();
+                    public void setText(String t);
+public void setEchoChar(char c)使用该方法重新设置回显字符.                       
+public char[] getPassword()方法可以返回实际的密码
+
+§9.3.2    常用容器
+JComponent是Container的子类，因此JComponent子类创建的组件也都是容器。容器经常用来添加组件。JFrame是底层容器，本节提到的容器被习惯地称做中间容器，中间容器必须被添加到底层容器中才能发挥作用。 
+
+
+
+
+
+§9.3.3    常用布局_1
+当把组件添加到容器中时，希望控制组件在容器中的位置，这就需要学习布局设计的知识。
+我们将分别介绍java.awt包中的FlowLayout、BorderLayout、CardLayout、GridLayout布局类和java.swing.border包中的BoxLayout布局类。
+   
+容器可以使用方法：
+           setLayout(布局对象);
+   来设置自己的布局，控制组件在容器中的位置
+§9.3.3    常用布局_1
+1．FlowLayout布局:是JPanel型容器的默认布局
+	1)创建布局对象 : FlowLayout flow=new FlowLayout();
+	2)容器con使用布局对象: con.setLayout(flow);
+	3)con可以使用Container类提供的add方法将组件顺序地添加到容器中
+    FlowLayout布局对象调用相应的方法可以重新设置布局的对齐方式等.
+    如： public void setAlignment(int align) 
+2．BorderLayout布局:
+	BorderLayout 布局是Window型容器的默认布局 。
+	使用BorderLayout布局的容器con，可以使用add方法将一个组件b添加到中心区域：con.add(b,BorderLayout.CENTER);
+            或  con.add(BorderLayour.CENTER,b); 
+§9.3.3    常用布局_2
+3．CardLayout 布局 :  使用CardLayout的一般步骤如下：
+	  1)创建CardLayout对象 CardLayout card=new CardLayout();
+	  2)为容器设置布局 con.setLayout(card);
+	  3)容器调用add(String s,Component b)将组件b加入容器，并给出了显示该组件的代号s。
+	  4)布局对象card用CardLayout类提供的show()方法，显示容器con中组件代号为s的组件：card.show(con,s);
+	  使用CardLayout 的容器可以容纳多个组件，但是实际上同一时刻容器只能从这些组件中选出一个来显示，就像一叠“扑克牌”每次只能显示最上面一张一样，这个被显示的组件将占据所有的容器空间，依次排序
+
+§9.3.3    常用布局_2
+
+
+§9.3.3    常用布局_3
+§9. 4    处理事件
+学习组件除了要熟悉组件的属性和功能外，一个更重要的方面是学习怎样处理组件上发生的界面事件。当用户在文本框中键入文本后按回车键、单击按钮、在一个下拉式列表中选择一个条目等操作时，都发生界面事件。
+程序有时需对发生的事件作出反应，来实现特定的任务，例如，用户单击一个名字叫“确定”或名字叫“取消”的按钮，程序可能需要作出不同的处理。
+§9.4.1    事件处理模式
+
+§9.4.2    ActionEvent事件
+
+§9.4.2    ActionEvent事件
+§9.4.3    ItemEvent事件
+§9.4.3    ItemEvent事件
+§9.4.4    DocumentEvent事件
+§9.4.5    MouseEvent事件_1
+§9.4.5    MouseEvent事件_1
+§9.4.5    MouseEvent事件_3
+§9.4.6   焦点事件
+§9.4.7   键盘事件
+§9.4.8 窗口事件
+JFrame及子类创建的窗口可以调用
+        setDefaultCloseOperation(int operation);
+方法设置窗口的关闭方式（如前面各个例子所示）.
+但是setDefaultCloseOperation方式可能不能满足程序的需要，比如，用户单击窗口上的关闭图标时，可能程序需要提示用户是否需要保存窗口中的有关数据到磁盘等 .
+§9.4.8 窗口事件
+2. WindowAdapter适配器 .
+每个具有不止一个方法的AWT监听器接口都有一个实现了它的所有方法，但却不做任何工作的适配器类。
+ComponentAdapter
+ContainerAdapter
+FocusAdapter
+KeyAdapter
+MouseAdapter
+MouseMotionAdapter
+WindowAdapter
+适配器可以代替接口来处理事件，当Java提供处理事件的接口中多于一个方法时，Java相应地就提供一个适配器类，比如WindowAdapter类。适配器已经实现了相应的接口，例如WindowAdapter类实现了WindowListener接口。因此，可以使用WindowAdapte的子类创建的对象做监视器，在子类中重写所需要的接口方法即可。 
+
+§9.4.9    匿名类实例或窗口做监视器
+§9.4.10    事件总结
+§9. 5  使用MVC结构
+模型-视图-控制器（Model-View-Controller），简称为MVC。
+MVC是一种先进的设计结构，其目的是以会话形式提供方便的GUI支持。
+MVC是一种通过三个不同部分构造一个软件或组件的理想办法：
+模型(model)  用于存储数据的对象。
+视图(view)   为模型提供数据显示的对象。
+控制器(controller)处理用户的交互操作，对于用户的操作作出响应，让模型和视图进行必要的交互，即通过视图修改、获取模型中的数据；当模型中的数据变化时，让视图更新显示。
+ 
+
+§9. 5  使用MVC结构
+§9. 6   对话框
+JDialog类和JFrame都是Window的子类，二者的实例都是底层容器。
+JDialog类创建的对话框必须要依赖于某个窗口。 
+对话框分为无模式和有模式两种。
+有模式的对话框：当这个对话框处于激活状态时，只让程序响应对话框内部的事件，而且将堵塞其它线程的执行，用户不能再激活对话框所在程序中的其它窗口，直到该对话框消失不可见。
+无模式对话框：当这个对话框处于激活状态时，能再激活其它窗口，也不堵塞其它线程的执行。 
+
+§9.6.1    消息对话框
+§9.6.2    输入对话框
+§9.6.3    确认对话框
+§9.6.4    颜色对话框
+§9.6.5    自定义对话框
+创建对话框与创建窗口类似，通过建立JDialog的子类来建立一个对话框类，然后这个类的一个实例，即这个子类创建的一个对象，就是一个对话框。对话框是一个容器，它的默认布局是BorderLayout，对话框可以添加组件，实现与用户的交互操作。 
+
+构造对话框的2个常用构造方法
+JDialog() 构造一个无标题的初始不可见的对话框，对话框依赖一个默认的不可见的窗口，该窗口由Java运行环境提供。
+JDialog(JFrame owner) 构造一个无标题的初始不可见的无模式的对话框，owner是对话框所依赖的窗口，如果owner取null，对话框依赖一个默认的不可见的窗口，该窗口由Java运行环境提供。
+
+总结
+掌握组件类和容器类的概念。
+掌握各种组件的特点和使用方法。
+本章重点掌握组件上的事件处理，Java处理事件的模式是：事件源、监视器、处理事件的接口。

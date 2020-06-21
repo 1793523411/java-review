@@ -1,0 +1,8 @@
+Hello!
+This is my first text file,
+You can see how this is done. 
+输入一行中文也可以
+Hello!
+This is my first text file,
+You can see how this is done. 
+输入一行中文也可以

@@ -1,0 +1,204 @@
+第十一章 Java网络编程
+11.1 Java网络程序设计的基本概念
+网络将世界联系在一起，使世界变得更加丰富多彩。同时网络互连是一个内容丰富而复杂的主题，所以这方面的程序设计涉及面很广且不易掌握
+与其他语言相比，Java语言在网络应用程序方面具有一定的优势。Java提供了很多内置的网络功能，使得基于Internet和Web的应用开发变得更加容易
+11.1.1 协议
+所有使用或实现某种Internet服务的程序都必须遵从一个或多个网络协议，这种协议很多，而IP、TCP、UDP是最为根本的三种协议，是所有其它协议的基础
+IP（Internet Protocol，Internet协议）
+是最底层的协议
+定义了数据按照数据报（Datagram，一种自带寻址信息的、独立地从数据源走到终点的数据包）传输的格式和规则
+TCP（Transport Control Protocol，传输控制协议）
+建立在IP之上，定义了网络上程序到程序的数据传输格式和规则，提供了IP数据包的传输确认、丢失数据包的重新请求、将收到的数据包按照它们的发送次序重新装配的机制
+是面向连接的协议，在开始数据传输之前，必须先建立明确的连接
+UDP（User Datagram Protocol，用户数据报协议）
+与TCP相似，比TCP具有更好的传输效率。
+不可靠的，不保证数据的传输，也不提供重新排列次序或重新请求功能，是一种无连接协议
+11.2 关于URI
+URI（Uniform Resource Identifier,统一资源标志符） 
+表示的是web上每一种可用的资源，如 HTML文档、图像、视频片段、程序等都由一个URI进行标识的。
+URI通常由三部分组成：
+①资源的命名机制；
+②存放资源的主机名；
+③资源自身的名称。
+
+11.2 关于URI
+URI举例如：https://blog.csdn.net/qq_32595453/article/details/79516787
+我们可以这样解释它：①这是一个可以通过https协议访问的资源，②位于主机 blog.csdn.net上，③通过“/qq_32595453/article/details/79516787”可以对该资源进行唯一标识（注意，这个不一定是完整的路径）
+11. 2 关于URI(续)                            ——URL类
+URL（Uniform Resource Locator），“统一资源定位 符”
+采用URL可以用一种统一的格式来描述各种信息资源，包括文件、服务器的地址和目录等。URL是URI概念的一种实现方式。
+一个URL对象通常包含最基本的三部分信息：协议、地址、资源。 
+
+11. 2 关于URI(续)                            ——URL类
+URL
+URL的一般格式为(带方括号[]的为可选项)：
+protocol :// hostname[:port]/path/[;parameters][?query]#fragment
+①第一部分是协议(或称为服务方式)。②第二部分是存有该资源的主机IP地址(有时也包括端口号)。③第三部分是主机资源的具体地址，如目录和文件名等。
+第一部分和第二部分用“://”符号隔开，第二部分和第三部分用“/”符号隔开。第一部分和第二部分是不可缺少的，第三部分有时可以省略。 
+11. 2 关于URI(续)                            ——URL类
+Java语言提供了URL类让我们能在源代码层使用URL，使用URL创建对象的应用程序称作客户端程序。 
+URL类通常使用如下的构造方法创建一个URL对象：
+public URL(String spec) throws MalformedURLException 
+public URL(String protocol, String host,String file) throws MalformedURLException 
+URL对象调用 
+        InputStream openStream()
+方法可以返回一个输入流，该输入流指向URL对象所包含的资源。通过该输入流可以将服务器上的资源读入到客户端。 
+
+11. 2 关于URI(续)                            ——例 1
+例子1(Example11_1.java , Look.java )用户在命令行窗口输入网址，读取服务器上的资源 .
+11. 2 关于URI(续)                           
+URI和URL都定义了资源是什么，但URL还定义了该如何访问资源。URL是一种具体的URI，它是URI的一个子集，它不仅唯一标识资源，而且还提供了定位该资源的信息。
+URI 是一种语义上的抽象概念，可以是绝对的，也可以是相对的，而URL则必须提供足够的信息来定位，是绝对的。
+11.3 关于InetAddress类
+地址的表示
+Internet上的主机有两种方式表示地址：
+1．域名 
+例如  www.tsinghua.edu.cn
+2．IP地址
+例如   202.108.35.210
+java.net包中的InetAddress类对象含有一个Internet主机地址的域名和IP地址，例如 www.sina.com.cn/202.108.37.40 。 
+11.3 关于InetAddress类
+1．获取Internet上主机的地址
+可以使用InetAddress类的静态方法getByName(String s);
+获得一个InetAddress对象，该对象含有主机地址的域名和IP地址，该对象用如下格式表示它包含的信息：
+	www.sina.com.cn/202.108.37.40
+2．获取本地机的地址
+我们可以使用InetAddress类的静态方法getLocalHost()获得一个InetAddress对象,该对象含有本地机的域名和IP地址。 
+例子2
+11.4 基于套接字的有连接通信
+基于套接字(socket)的有连接通信
+使用TCP协议
+IP地址标识Internet上的计算机，端口号标识正在计算机上运行的进程（程序）。端口号被规定为一个16位的0～65535之间的整数。 
+当两个程序需要通信时，它们可以通过使用Socket类建立套接字对象并连接在一起（端口号与IP地址的组合得出一个网络套接字）。
+11.4 基于套接字的有连接通信
+基于套接字(socket)的有连接通信
+一个socket必须在发送数据之前与目的地的socket取得连接
+一旦连接建立了，sockets就可以使用一个流接口完成打开-读-写-关闭，所有的发送的信息都会在另一端以同样的顺序被接收
+面向连接的操作比无连接的操作效率低，但是数据的安全性高
+11.4 基于套接字的有连接通信(续)                                 ——服务器端
+用Java建立简单的服务器程序需要五个步骤
+Step1：创建ServerSocket对象
+ServerSocket myServer  =  new ServerSocket (int port, int backlog);
+Port 指定一个可用的端口号，用来定位服务器上的服务器应用程序
+backlog指定能够连接到服务器的最多客户数。连接客户达到由backlog指定的最大客户数量时，服务器将拒绝客户连接
+Step 2：通过ServerSocket的accept方法监听客户连接，服务器无限期的监听客户连接
+Socket connection = myServer.accept();
+有一个客户连接时，将产生并返回一个socket
+
+11.4基于套接字的有连接通信(续)                                 ——服务器端
+Step 3：通过Socket的方法getInputStream和getOutputStream获取InputStream和OutputStream对象；通常将其他流类型和它们联系起来，如：
+ObjectInputStream input = new ObjectInputStream( connection.getInputStream( ) );
+ObjectOutputStream output = new ObjectOutputStream( connection.getOutputStream( ) );
+Step 4：客户和服务器通过OutputStream和InputStream对象进行通信
+Step 5：通信传输完毕，服务器通过调用流和套接字的close方法关闭连接
+
+11.4 基于套接字的有连接通信(续)                                 ——客户端
+在客户端建立简单连接的思路类似，可分为四步
+Step 1：建立一个Socket，实现与服务器的连接
+Socket connection = new Socket ( InetAddress address, int port);
+address：服务器IP地址。port：端口号
+连接成功，将返回一个Socket，否则产生异常
+Step 2：通过getInputStream和getOutputStream分别获取Socket的InputStream和OutputStream的引用。同样，也可以将其他流类型与InputStream和OutputStream联系起来
+Step 3：客户与服务器通过InputStream和OutputStream进行通信
+Step 4：传输完毕后，通过调用流和套接字的close方法关闭连接
+11.4 基于套接字的有连接通信(续)                                 ——客户端
+客户端的套接字获得的输入\输出流和服务器端的套接字获得的输出\输入流互相连接.
+
+11.4 基于套接字的有连接通信(续)                                 ——例3
+例子3中，客户端向服务器问了三句话，服务器都给出了一一的回答。首先将例子3中服务器端的Server.java编译通过，并运行起来，等待客户的呼叫，然后运行客户端程序。客户端运行效果如图13.3，服务器端运行效果如图13.4。
+
+11.5 使用多线程技术
+为了防止堵塞线程，服务器端收到一个客户的套接字后，就应该启动一个专门为该客户服务的线程。
+在下面的例子4中，客户使用Socket类不带参数的构造方法Socket()创建一个套接字对象，该对象需调用
+public void connect(SocketAddress endpoint) throws IOException
+请求和参数SocketAddress指定地址的套接字建立连接。
+为了使用connect方法，可以使用SocketAddress的子类InetSocketAddress创建一个对象，InetSocketAddress的构造方法是：
+InetSocketAddress(InetAddress
+11.5 使用多线程技术
+ 例子4中，客户输入圆的半径并发送给服务器，服务器把计算出的圆的面积返回给客户。因此可以将计算量大的工作放在服务器端，客户负责计算量小的工作，实现客户-服务器交互计算，来完成某项任务。首先将例子4中服务器端的程序编译通过，并运行起来，等待客户的呼叫。客户端运行效果如图13.6，服务器端运行效果如图13.7。 
+11.6 数据报通信
+数据报通信(Datagram Communication)
+使用用户数据报协议 ( User Datagram Protocol, UDP) 
+与TCP不同的一种协议
+不能保证数据会被成功地送达，也不保证数据抵达的次序与送出的次序相同，所以也被称为“不可靠的通信协议”，虽然可靠性不高，但是它的速度很快，所以有些场合也有很大的用处
+基于UDP通信的基本模式是：
+1．将数据打包，称为数据包（好比将信件装入信封一样），然后将数据包发往目的地。
+2．接受别人发来的数据包（好比接收信封一样），然后查看数据包中的内容。 
+11.6 数据报通信
+数据报通信(Datagram Communication)
+服务器通过DatagramSocket接收或发送信息，这些信息以DatagramPackets 的形式存在
+DatagramSocket mySocket = new DatagramSocket ( int  port );
+port表示端口，上述语句将服务器绑定到一个可以从客户端接收packet的端口上，如果绑定失败，将产生SocketException异常
+11.6 数据报通信(续)                                   ——客户端
+客户端应用程序的工作流程
+Step1：通过创建一个DatagramSocket对象来建立数据报通讯的Socket。有如下两种构造方法
+public DatagramSocket() 
+构造一个数据报socket，并使其与本地主机任一可用的端口连接。若打不开socket则抛出SocketException异常。
+public DatagramSocket(int port)
+ 构造一个数据报socket，并使其与本地主机指定的端口连接。若打不开socket或socket无法与指定的端口连接则抛出SocketException异常
+11.6 数据报通信(续)                                   ——客户端
+Step 2：用DatagramPacket类来创建一个数据报包，用来实现无连接的包传送服务
+DatagramPacket对象封装了数据报包的数据(bufferedarray[]，包长度(length)，目标地址(address)，目标端口(port)；length必须小于等于bufferedarry.length
+     DatagramPacket（byte bufferedarray[], int length, 
+                                  InetAddress address, int port）
+DatagramPacket类提供了四个方法来获取信息
+public byte[] getData() 返回一个字节数组，包含收到或要发送的数据报中的数据
+public int getLength() 返回发送或接收到的数据的长度
+public InetAddress getAddress() 返回一个发送或接收此数据报包文的机器的IP地址
+public int getPort() 返回发送或接收数据报的远程主机的端口号
+11.6数据报通信(续)                                   ——客户端
+Step 3：调用DatagramSocket对象的send(DatagramPacket p)方法发送数据报文包
+Step 4：调用DatagramSocket对象的receive(DatagramPacket p)方法接收从服务器返回的结果数据报文包
+该DatagramPacket对象用到另一种构造方法，只需指明存放接收的数据报的缓冲区和长度
+     DatagramPacket（byte bufferedarray[], int length）
+receive方法会一直阻塞，直到收到一个数据报文包，此时DatagramPacket的缓冲区中包含的就是接收到的数据，也包含发送者的IP地址，发送者机器上的端口号等信息
+Step 5：处理接收缓冲区内的数据，获取服务结果
+Step 6：通讯完成后，使用DatagramSocket对象的close()方法来关闭数据报通讯Socket
+
+11.6 数据报通信(续)                                 ——服务器端
+服务器端应用程序的工作流程 
+与客户端应用程序的通讯过程使非常相似 
+建立数据报通讯DatagramSocket
+构建数据报文包DatagramPacket
+接收数据报和发送数据报，处理接收缓冲区内的数据
+通讯完毕后，关闭数据报通讯Socket
+不同的是，服务器应用程序要面向网络中的所有计算机，所以服务器应用程序收到一个包文后要分析它，得到数据报的源地址信息，这样才能创建正确的返回结果报文给客户机
+11.6 数据报通信(续)                                 ——服务器端
+import java.net.*;
+public class TestUDPServer{
+	public static void main(String args[]) throws Exception{
+		byte buf[] = new byte[1024];
+		DatagramPacket dp = new DatagramPacket(buf, buf.length);
+		DatagramSocket ds = new DatagramSocket(5678);
+		while(true)
+		{
+		       ds.receive(dp);
+	                System.out.println(new String(buf,0,dp.getLength()));
+		}
+	}
+}
+11.6 数据报通信(续)                                 ——客户端
+import java.net.*;
+public class TestUDPClient{
+	public static void main(String args[]) throws Exception{
+		byte[] buf = (new String("Hello")).getBytes();
+	DatagramPacket dp = new DatagramPacket(buf, buf.length, 
+		               new InetSocketAddress("127.0.0.1", 5678));
+		DatagramSocket ds = new DatagramSocket(9999);
+		ds.send(dp);
+		ds.close();
+	}
+}
+11.6数据报通信(续)                                 ——例5
+例子5中：张山和李四使用用户数据报（可用本地机模拟）互相发送和接收数据包，程序运行时“张三”所在主机在命令行输入数据发送给“李四”所在主机，将接收到的数据显示在命令行的右侧（效果如图13.8）；同样，“李四”所在主机在命令行输入数据发送给“张三”所在主机，将接收到的数据显示在命令行的右侧（效果如图13.9）。
+11.7 本章小结
+本章内容
+Java网络程序设计的基本概念
+URI类
+InetAddress类
+基于TCP协议的有连接通讯
+基于UDP协议的数据报通讯
+本章要求
+掌握基于TCP协议的有连接通讯和基于UDP协议的数据报通讯
+熟悉URL类，InetAddress类
+

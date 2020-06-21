@@ -1,0 +1,3 @@
+Hello!
+This is another text file using BufferedWriter,
+So I can use a common way to start a newline
